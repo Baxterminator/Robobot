@@ -82,7 +82,7 @@ void BPlan20::run()
   UTime t("now");
   bool finished = false;
   bool lost = false;
-  state = 30;
+  state = 10;
   oldstate = state;
   //
   toLog("Plan20 started");
@@ -91,16 +91,24 @@ void BPlan20::run()
   {
     switch (state)
     { // make a shift in heading-mission
-      case 30: // Following the edge test
-       
-          toLog("Line detected, that is OK to follow");
-          mixer.setEdgeMode(true /* left */, 0 /* offset */);
-          mixer.setVelocity(0.3);
-          state = 40;
-          pose.dist = 0;
-      break;
-
-     
+      case 10:
+        pose.resetPose();
+        toLog("forward at 0.3m/s");
+        mixer.setVelocity(0.3);
+        state = 11;
+        break;
+      case 11: // wait for distance
+        if (pose.dist >= 1.0)
+        { // done, and then
+          finished = true;
+        }
+        else if (t.getTimePassed() > 10)
+          lost = true;
+        break;
+      default:
+        toLog("Unknown state");
+        lost = true;
+        break;
     }
     if (state != oldstate)
     {
@@ -146,4 +154,3 @@ void BPlan20::toLog(const char* message)
            message);
   }
 }
-
