@@ -113,7 +113,7 @@ void BPlan20::run()
       case 30: // Reaching the Slope
         pose.resetPose();
         pose.dist = 0;
-        tolog("Climbing up the slope");
+        toLog("Climbing up the slope");
         mixer.setEdgeMode(false/* right */, -0.03/* offset */);
         mixer.setVelocity(0.2);
         state = 40;
@@ -122,7 +122,7 @@ void BPlan20::run()
       case 40: // Finish Climbing up
         pose.resetPose();
         pose.dist = 0;
-        tolog("Continue straight to the bar");
+        toLog("Continue straight to the bar");
         mixer.setEdgeMode(false/* left */, -0.03/* offset */);
         mixer.setVelocity(0.2);
         state = 50;
@@ -131,7 +131,7 @@ void BPlan20::run()
       case 50: // Turn left to the bar
         pose.resetPose();
         pose.dist = 0;
-        tolog("Go left to the bar with very low speed");
+        toLog("Go left to the bar with very low speed");
         mixer.setEdgeMode(false/* left */, -0.03/* offset */);
         mixer.setVelocity(0.15);
         mixer.setTurnrate(1.0); //Turn left
