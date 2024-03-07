@@ -104,7 +104,7 @@ void BPlan20::run()
       case 20: // Go to the right path
         pose.resetPose();
         pose.dist = 0;
-        tolog("See intersection, go to the right, reduce the speed to 0.2");
+        toLog("See intersection, go to the right, reduce the speed to 0.2");
         mixer.setEdgeMode(false/* right */, -0.03 /* offset */);
         mixer.setVelocity(0.2);
         state = 30;
@@ -138,9 +138,9 @@ void BPlan20::run()
         break;
 
       case 60: // stop turning and go straight to the bar
-        if(pose.Turned > 1.7)
+        if(pose.turned > 1.7)
         {
-          mixer.setTurnrate(0.0) // Stop turning
+          mixer.setTurnrate(0.0); // Stop turning
           mixer.setEdgeMode(false/* left */, -0.03/* offset */);
           mixer.setVelocity(0.2); 
   
