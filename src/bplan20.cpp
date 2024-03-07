@@ -88,7 +88,7 @@ void BPlan20::run()
   //
   toLog("Plan20 started");
   //
-  while (not finished and not lost and not service.stop)
+  while (1)
   {
     switch (state)
     { 
@@ -96,7 +96,6 @@ void BPlan20::run()
         pose.resetPose();
         pose.dist = 0;
         toLog("starting at 0.3m/s");
-        mixer.setEdgeMode(false /* right */, -0.03 /* offset */);
         mixer.setVelocity(0.3);
         
         break;
