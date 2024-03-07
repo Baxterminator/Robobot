@@ -98,7 +98,7 @@ void BPlan20::run()
         toLog("starting at 0.3m/s");
         mixer.setEdgeMode(false /* right */, -0.03 /* offset */);
         mixer.setVelocity(0.3);
-        state = 20;
+        
         break;
 
       case 20: // Go to the right path
