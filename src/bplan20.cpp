@@ -90,25 +90,65 @@ void BPlan20::run()
   while (not finished and not lost and not service.stop)
   {
     switch (state)
-    { // make a shift in heading-mission
-      case 10:
+    { 
+      case 10: // Starting the track >> Pass the gate >> see the intersection
         pose.resetPose();
-        toLog("forward at 0.3m/s");
+        pose.dist = 0;
+        toLog("starting at 0.3m/s");
+        mixer.setEdgeMode(false /* right */, -0.03 /* offset */);
         mixer.setVelocity(0.3);
-        state = 11;
+        state = 20;
         break;
-      case 11: // wait for distance
-        if (pose.dist >= 1.0)
-        { // done, and then
-          finished = true;
+
+      case 20: // Go to the right path
+        pose.resetPose();
+        pose.dist = 0;
+        tolog("See intersection, go to the right, reduce the speed to 0.2");
+        mixer.setEdgeMode(false/* right */, -0.03 /* offset */);
+        mixer.setVelocity(0.2);
+        state = 30;
+        break;
+
+      case 30: // Reaching the Slope
+        pose.resetPose();
+        pose.dist = 0;
+        tolog("Climbing up the slope");
+        mixer.setEdgeMode(false/* right */, -0.03/* offset */);
+        mixer.setVelocity(0.2);
+        state = 40;
+        break;
+
+      case 40: // Finish Climbing up
+        pose.resetPose();
+        pose.dist = 0;
+        tolog("Continue straight to the bar");
+        mixer.setEdgeMode(false/* left */, -0.03/* offset */);
+        mixer.setVelocity(0.2);
+        state = 50;
+        break;
+
+      case 50: // Turn left to the bar
+        pose.resetPose();
+        pose.dist = 0;
+        tolog("Go left to the bar with very low speed");
+        mixer.setEdgeMode(false/* left */, -0.03/* offset */);
+        mixer.setVelocity(0.15);
+        mixer.setTurnrate(1.0); //Turn left
+        break;
+
+      case 60: // stop turning and go straight to the bar
+        if(pose.Turned > 1.7)
+        {
+          mixer.setTurnrate(0.0) // Stop turning
+          mixer.setEdgeMode(false/* left */, -0.03/* offset */);
+          mixer.setVelocity(0.2); 
+  
+        
         }
-        else if (t.getTimePassed() > 10)
-          lost = true;
-        break;
-      default:
-        toLog("Unknown state");
-        lost = true;
-        break;
+        
+
+
+
     }
     if (state != oldstate)
     {
