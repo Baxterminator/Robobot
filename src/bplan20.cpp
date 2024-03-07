@@ -36,6 +36,7 @@
 #include "medge.h"
 #include "cedge.h"
 #include "cmixer.h"
+#include "sdist.h"
 
 #include "bplan20.h"
 
