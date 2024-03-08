@@ -40,7 +40,7 @@ void CEdge::setup()
 { // ensure there is default values in ini-file
   if (not ini.has("edge") or not ini["edge"].has("printCtrl"))
   { // motor block is OK, but control parameters are needed too
-    ini["edge"]["kp"] = "40.0"; // unit is (turnrate (m/sec) per sensor error (m))
+    ini["edge"]["kp"] = "15.0"; // unit is (turnrate (m/sec) per sensor error (m))
     ini["edge"]["lead"] = "0.3 0.5"; // tau_d (sec) and alpha; tau_d = 0.0 means no function
     ini["edge"]["taui"] = "0.0"; // tau_i (sec) 0.0 is no integrator function
     ini["edge"]["logCedge"] = "true"; // log from this module - but not all control parameters
