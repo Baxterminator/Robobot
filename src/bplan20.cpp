@@ -76,7 +76,7 @@ void BPlan20::run() {
   UTime t("now");
   bool finished = false;
   bool lost = false;
-  state = 10;
+  state = 11;
   oldstate = state;
   //
   toLog("Plan20 started");
@@ -92,7 +92,7 @@ void BPlan20::run() {
     case 11: // wait for distance
       pose.resetPose();
       pose.dist = 0;
-      toLog("See intersection, go to the right, reduce the speed to 0.2");
+      toLog("tracking the line with 0.2 m/s");
       mixer.setEdgeMode(false /* right */, -0.03 /* offset */);
       mixer.setVelocity(0.2);
       break;
