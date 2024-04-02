@@ -87,9 +87,61 @@ void BPlan20::run() {
       pose.resetPose();
       pose.dist = 0;
       toLog("Tracking the line2");
-      mixer.setEdgeMode(false /* right */,-0.02  /* offset */);
-      mixer.setVelocity(0.15);
+      //mixer.setEdgeMode(false /* right */,-0.02  /* offset */);
+      mixer.setVelocity(0.30);
+      state = 12;
+      
       break;
+    case 12: 
+	if(pose.dist > 0.75) {
+	mixer.setVelocity(0.0);
+	state = 13;
+	}
+
+	break;
+    
+    case 13:
+        mixer.setTurnrate(-1.0); 
+        state = 14;
+
+        break;
+
+    case 14:
+       
+        if(pose.turned < -1.5) {
+ 	mixer.setTurnrate(0.0);
+	state = 15;
+	}
+
+	break;
+    case 15: 
+	pose.resetPose();
+	pose.dist = 0;
+ 	mixer.setVelocity(0.3);
+	state = 16;
+	break;
+
+    case 16: 
+	if(pose.dist > 2.5){
+	mixer.setVelocity(0.0);
+	state = 17;
+	}
+	break;
+
+    case 17:
+	pose.resetPose();
+	pose.dist = 0;
+	mixer.setTurnrate(1.0);
+	state = 18;
+	break;
+
+    case 18:
+	if(pose.turned > 0.7){
+	mixer.setTurnrate(0.0);
+	mixer.setVelocity(0.0);
+	}
+	break;
+
     default:
       toLog("Unknown state");
       lost = true;
