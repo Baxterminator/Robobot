@@ -76,25 +76,19 @@ void BPlan20::run() {
   UTime t("now");
   bool finished = false;
   bool lost = false;
-  state = 10;
+  state = 11;
   oldstate = state;
   //
   toLog("Plan20 started");
   //
   while (not finished and not lost and not service.stop) {
     switch (state) { // make a shift in heading-mission
-    case 10:
-      pose.resetPose();
-      toLog("forward at 0.3m/s");
-      mixer.setVelocity(0.3);
-      // state = 11;
-      break;
-    case 11: // wait for distance
+    case 11: // tracking the line
       pose.resetPose();
       pose.dist = 0;
-      toLog("See intersection, go to the right, reduce the speed to 0.2");
-      mixer.setEdgeMode(false /* right */, -0.03 /* offset */);
-      mixer.setVelocity(0.2);
+      toLog("Tracking the line2");
+      mixer.setEdgeMode(false /* right */,-0.02  /* offset */);
+      mixer.setVelocity(0.15);
       break;
     default:
       toLog("Unknown state");
