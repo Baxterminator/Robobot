@@ -67,6 +67,10 @@ void BPlan20::setup() { // ensure there is default values in ini-file
 
 BPlan20::~BPlan20() { terminate(); }
 
+constexpr float DEG_90{1.5707};
+constexpr float ROBOT_SPEED{0.3};
+constexpr float ROBOT_TR{1.0};
+
 void BPlan20::run() {
   if (not setupDone)
     setup();
@@ -79,68 +83,92 @@ void BPlan20::run() {
   state = 11;
   oldstate = state;
   //
-  toLog("Plan20 started");
+  toLog("Backup plan started");
   //
   while (not finished and not lost and not service.stop) {
-    switch (state) { // make a shift in heading-mission
-    case 11: // tracking the line
+    switch (state) {
+
+    // Advance forward
+    case 11:
       pose.resetPose();
       pose.dist = 0;
-      toLog("Tracking the line2");
-      //mixer.setEdgeMode(false /* right */,-0.02  /* offset */);
-      mixer.setVelocity(0.30);
+      mixer.setVelocity(ROBOT_SPEED);
       state = 12;
-      
       break;
-    case 12: 
-	if(pose.dist > 0.75) {
-	mixer.setVelocity(0.0);
-	state = 13;
-	}
 
-	break;
-    
-    case 13:
-        mixer.setTurnrate(-1.0); 
+    // Wait for distance to complete and turn right (align to first gate)
+    case 12:
+      if (pose.dist > 0.75) {
+        pose.resetPose();
+        pose.turned = 0;
+        mixer.setVelocity(0.0);
+        mixer.setTurnrate(-ROBOT_TR);
         state = 14;
+      }
+      break;
 
-        break;
-
+    // Wait for angle and go forward (pass first gate)
     case 14:
-       
-        if(pose.turned < -1.5) {
- 	mixer.setTurnrate(0.0);
-	state = 15;
-	}
+      if (std::fabs(pose.turned) > DEG_90) {
+        mixer.setTurnrate(0.0);
+        pose.resetPose();
+        pose.dist = 0;
+        mixer.setVelocity(ROBOT_SPEED);
+        state = 16;
+      }
+      break;
 
-	break;
-    case 15: 
-	pose.resetPose();
-	pose.dist = 0;
- 	mixer.setVelocity(0.3);
-	state = 16;
-	break;
+    // Wait for distance and turn left (align for going by the crossing path)
+    case 16:
+      if (pose.dist > 2.5) {
+        pose.resetPose();
+        pose.dist = 0;
+        pose.turned = 0;
+        mixer.setVelocity(0.0);
+        mixer.setTurnrate(ROBOT_TR);
+        state = 18;
+      }
+      break;
 
-    case 16: 
-	if(pose.dist > 2.5){
-	mixer.setVelocity(0.0);
-	state = 17;
-	}
-	break;
-
-    case 17:
-	pose.resetPose();
-	pose.dist = 0;
-	mixer.setTurnrate(1.0);
-	state = 18;
-	break;
-
+    // Wait for angle and go straight (long crossing run)
     case 18:
-	if(pose.turned > 0.7){
-	mixer.setTurnrate(0.0);
-	mixer.setVelocity(0.0);
-	}
-	break;
+      if (std::fabs(pose.turned) > 0.7) {
+        pose.resetPose();
+        pose.dist = 0;
+        pose.turned = 0;
+        mixer.setTurnrate(0.0);
+        mixer.setVelocity(ROBOT_SPEED);
+      }
+      break;
+
+    // Wait for the distance and go turn left (align for the goal)
+    case 20:
+      if (pose.dist > 5.0) {
+        pose.resetPose();
+        pose.dist = 0;
+        pose.turned = 0;
+        mixer.setTurnrate(ROBOT_TR);
+        mixer.setVelocity(0.0);
+      }
+      break;
+
+    // Wait for the angle, and go straight (to hit the goal)
+    case 22:
+      if (std::fabs(pose.turned) > DEG_90) {
+        pose.resetPose();
+        pose.dist = 0;
+        pose.turned = 0;
+        mixer.setTurnrate(0.0);
+        mixer.setVelocity(ROBOT_SPEED);
+      }
+      break;
+
+    // Wait for goal hitting
+    case 24:
+      if (pose.dist > 3.0) {
+        finished = true;
+      }
+      break;
 
     default:
       toLog("Unknown state");
